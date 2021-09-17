@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+
+# By Jonathan
+
+# Cores
+cyan=`tput setaf 6 ; tput bold`
+blue=`tput setaf 4 ; tput bold`
+green=`tput setaf 2 ; tput bold`
+red=`tput setaf 1 ; tput bold`
+blink=`tput blink`
+bold=`tput sgr0 ; tput bold`
+reset=`tput sgr0`
+
+# Início
+clear
+tput civis -- invisible
+echo -n "${cyan}[Terminal] ${bold}Iniciando o script"
+sleep 0.5 ; echo -n "."
+sleep 0.5 ; echo -n "."
+sleep 0.5 ; echo -n "."
+sleep 0.7
+clear
+
+#dnf config
+sleep 0.7 ; echo -e "${cyan}[Terminal] ${bold}Antes de tudo, coloque estas linhas no arquivo ${blue}/etc/dnf/dnf.conf${bold}:"
+echo
+sleep 0.7 ; echo -e "fastestmirror=${green}true" 
+echo -e "${bold}deltarpm=${green}true"
+echo ; echo 
+
+#Pergunta
+sleep 0.7 ; tput cnorm -- normal ; read -r -p "${cyan}[Terminal] ${bold}Deseja continuar? [${green}s${bold}/${red}n${bold}]${reset}
+" response
+
+clear
+
+#Sim
+case "$response" in
+    [sS][iI][mM]|[sS]|[yY]) 
+    
+       tput cnorm -- normal
+        
+             sudo dnf up
+
+             wget -c https://extensions.libreoffice.org/assets/downloads/z/veroptbrv320aoc.oxt 
+             
+             sudo dnf config-manager --set-enabled google-chrome
+
+             sudo dnf install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm -y
+
+             sudo dnf install https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm -y
+
+             sudo dnf install gnome-tweaks google-chrome-stable libreoffice-langpack-pt-BR libreoffice-math vlc tlp ffmpeg pdfarranger menulibre youtube-dl neofetch calibre qbittorrent snes9x-gtk telegram-desktop steam gnome-screenshot papirus-icon-theme util-linux-user p7zip p7zip-plugins lzip cabextract unrar python gtkhash trash-cli qwinff kodi
+             
+             sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo ; sudo flatpak install flathub com.spotify.Client
+             
+             clear && sleep 0.3 ; echo -n "${cyan}[Terminal] ${bold}Instalação concluída.${reset}" ; echo ; echo
+        ;;
+        
+#Se "response" for diferente de SIM       
+    *)
+        tput civis -- invisible ; echo "${cyan}[Terminal] ${red}${blink}ERR0R :(${reset}" ; sleep 2.5 && clear && tput cnorm -- normal ; exit
+        ;;
+esac
