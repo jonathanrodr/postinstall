@@ -21,20 +21,20 @@ sleep 0.5 ; echo -n "."
 sleep 0.7
 clear
 
-#dnf config
+# dnf config
 sleep 0.7 ; echo -e "${cyan}[Terminal] ${bold}Antes de tudo, coloque estas linhas no arquivo ${blue}/etc/dnf/dnf.conf${bold}:"
 echo
 sleep 0.7 ; echo -e "fastestmirror=${green}true" 
 echo -e "${bold}deltarpm=${green}true"
 echo ; echo 
 
-#Pergunta
+# Pergunta
 sleep 0.7 ; tput cnorm -- normal ; read -r -p "${cyan}[Terminal] ${bold}Deseja continuar? [${green}s${bold}/${red}n${bold}]${reset}
 " response
 
 clear
 
-#Sim
+# Sim
 case "$response" in
     [sS][iI][mM]|[sS]|[yY]) 
     
@@ -57,7 +57,7 @@ case "$response" in
              clear && sleep 0.3 ; echo -n "${cyan}[Terminal] ${bold}Instalação concluída.${reset}" ; echo ; echo
         ;;
         
-#Se "response" for diferente de SIM       
+# Se "response" for diferente de SIM       
     *)
         tput civis -- invisible ; echo "${cyan}[Terminal] ${red}${blink}ERR0R :(${reset}" ; sleep 2.5 && clear && tput cnorm -- normal ; exit
         ;;
