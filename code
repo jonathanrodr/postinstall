@@ -2,63 +2,121 @@
 
 # By Jonathan
 
+# --------------------------------------------PARÂMETROS-------------------------------------------- #
 # Cores
 cyan=`tput setaf 6 ; tput bold`
-blue=`tput setaf 4 ; tput bold`
 green=`tput setaf 2 ; tput bold`
 red=`tput setaf 1 ; tput bold`
+yellow=`tput setaf 3 tput bold`
 blink=`tput blink`
 bold=`tput sgr0 ; tput bold`
-reset=`tput sgr0`
 
-# Início
-clear
-tput civis -- invisible
+# Diretórios
+DIRETORIO_DOWNLOADS="$HOME/Downloads/temp"
+
+# URLs
+LIBRE_EXTENSION="https://extensions.libreoffice.org/assets/downloads/z/veroptbrv320aoc.oxt" 
+
+# -------------------------------VERIFICAÇÃO DE USUÁRIO ROOT------------------------------- #
+# Verificando o login do usuário
+if [ $LOGNAME = "root" ]; then
+    # Se for igual a root, imprime a mensagem de errolj
+    	echo "${cyan}[Terminal] ${red}${blink}Execute sem sudo. :("  ; sleep 4 && clear
+    	exit 1
+fi
+
+# --------------------------------------------INTRODUÇÃO-------------------------------------------- #
 echo -n "${cyan}[Terminal] ${bold}Iniciando o script"
-sleep 0.5 ; echo -n "."
-sleep 0.5 ; echo -n "."
-sleep 0.5 ; echo -n "."
-sleep 0.7
+sleep 0.7 ; echo -n "."
+sleep 0.7 ; echo -n "."
+sleep 0.7 ; echo -n "."
+sleep 0.5
 clear
 
-# dnf config
-sleep 0.7 ; echo -e "${cyan}[Terminal] ${bold}Antes de tudo, coloque estas linhas no arquivo ${blue}/etc/dnf/dnf.conf${bold}:"
-echo
-sleep 0.7 ; echo -e "fastestmirror=${green}true" 
-echo -e "${bold}deltarpm=${green}true"
-echo ; echo 
+# ---------------------------------------TESTES E REQUISITOS---------------------------------------- #
+# Teste de conexão com internet
+if ! ping -c 1 8.8.8.8 -q &> /dev/null; then
+	echo -e "${red}[Terminal]  ${bold}Seu computador não tem conexão com a Internet. Verifique a rede."
+  exit 1
+else
+  echo -e "${green}[Terminal] ${bold}Conexão com a Internet funcionando normalmente."
+fi
 
-# Pergunta
-sleep 0.7 ; tput cnorm -- normal ; read -r -p "${cyan}[Terminal] ${bold}Deseja continuar? [${green}s${bold}/${red}n${bold}]${reset}
-" response
+# -------------------------------------ATUALIZAÇÃO DO SISTEMA--------------------------------------- #
+# Atualizando repositório e sistema
+sleep 1 ; echo -e "
+${cyan}[Terminal] ${bold}Atualizando o sistema."
+sudo dnf up -y
 
-clear
+Fazer o melhor com a nossa melhor realidade para que possamos ter uma realidade melhor e fazer melhor ainda.
 
-# Sim
-case "$response" in
-    [sS][iI][mM]|[sS]|[yY]) 
-    
-       tput cnorm -- normal
-        
-             sudo dnf up
+# -----------------------------------INSTALAÇÃO DE REPOSITÓRIOS------------------------------------- #
+# Instalação RPM Fusion
+echo -e "
+${cyan}[Terminal] ${bold}Instalando RPM Fusion."
+sudo dnf install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm -y
+sudo dnf install https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm -y
 
-             wget -c https://extensions.libreoffice.org/assets/downloads/z/veroptbrv320aoc.oxt 
-             
-             sudo dnf config-manager --set-enabled google-chrome
+# Adição do repositório do Google Chrome
+echo -e "
+${cyan}[Terminal] ${bold}Adicionando repositório do Google Chrome."
+sudo dnf config-manager --set-enabled google-chrome ; sleep 1
+ 
+# -------------------------------------------INSTALAÇÃO--------------------------------------------- #
+# Instalação de programas pelo DNF
+PROGRAMAS_PARA_INSTALAR=(
+   gnome-tweaks
+   google-chrome-stable
+   vlc
+   tlp
+   java
+   ffmpeg
+   pdfarranger
+   menulibre
+   youtube-dl
+   neofetch
+   calibre
+   transmission
+   snes9x-gtk
+   telegram-desktop
+   steam
+   papirus-icon-theme
+   zsh
+   util-linux-user 
+   p7zip 
+   p7zip-plugins 
+   lzip 
+   cabextract 
+   unrar
+   python
+   gnome-calendar
+   shotcut
+   libreoffice-math
+   qwinff
+)
 
-             sudo dnf install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm -y
+for nome_do_programa in ${PROGRAMAS_PARA_INSTALAR[@]}; do
+	if ! rpm -qa | grep -q $nome_do_programa; then # Só instala se já não estiver instalado
+		echo -e "
+${cyan}[Terminal] ${bold}Instalando ${yellow}"$nome_do_programa"${bold}." ; sudo dnf install "$nome_do_programa" -y
+	else
+		echo -e "
+${cyan}[Terminal] ${bold}Instalado ${yellow}"$nome_do_programa"${bold}."
+  	fi
+done
 
-             sudo dnf install https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm -y
+# Instalando pacotes Flatpak
+echo -e "
+${cyan}[Terminal] ${bold}Instalando programas em Flatpak."
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+flatpak install flathub com.spotify.Client -y
 
-             sudo dnf install gnome-tweaks google-chrome-stable libreoffice-langpack-pt-BR libreoffice-math vlc tlp ffmpeg pdfarranger menulibre youtube-dl neofetch calibre qbittorrent snes9x-gtk telegram-desktop steam gnome-screenshot papirus-icon-theme util-linux-user p7zip p7zip-plugins lzip cabextract unrar python gtkhash trash-cli qwinff kodi
-             
-             sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo ; sudo flatpak install flathub com.spotify.Client
-             
-             clear && sleep 0.3 ; echo -n "${cyan}[Terminal] ${bold}Instalação concluída.${reset}" ; echo ; echo
-        ;;
-        
-# Se "response" for diferente de SIM       
-    *)
-        tput civis -- invisible ; echo "${cyan}[Terminal] ${red}${blink}ERR0R :(${reset}" ; sleep 2.5 && clear && tput cnorm -- normal ; exit
-        ;;
-esac
+# Download e instalaçao de programas externos
+echo -e "
+${cyan}[Terminal] ${bold}Baixando arquivos."
+mkdir "$DIRETORIO_DOWNLOADS"
+wget -c "$LIBRE_EXTENSION" -P "$DIRETORIO_DOWNLOADS"
+
+# Fim
+echo -n "${cyan}[Terminal] ${bold}Instalação concluída."
+exit 1
